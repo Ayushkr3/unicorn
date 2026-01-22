@@ -1323,6 +1323,7 @@
 #define x86_cpu_pending_interrupt x86_cpu_pending_interrupt_x86_64
 #define x86_update_hflags x86_update_hflags_x86_64
 #define cpu_x86_init cpu_x86_init_x86_64
+#define cpu_x86_getSegCache cpu_x86_getSegC;
 #define helper_raise_interrupt helper_raise_interrupt_x86_64
 #define helper_raise_exception helper_raise_exception_x86_64
 #define raise_interrupt raise_interrupt_x86_64

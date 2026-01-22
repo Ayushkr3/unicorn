@@ -579,6 +579,7 @@ uc_err uc_reg_read_batch(uc_engine *uc, int const *regs, void **vals, int count)
 {
     UC_INIT(uc);
     reg_read_t reg_read = uc->reg_read;
+    
     void *env = uc->cpu->env_ptr;
     int mode = uc->mode;
     int i;
@@ -1085,7 +1086,7 @@ uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until,
     uc->size_recur_mem = 0;
     uc->timed_out = false;
     uc->first_tb = true;
-
+    
     // Avoid nested uc_emu_start saves wrong jit states.
     if (uc->nested_level == 0) {
         UC_INIT(uc);
@@ -3040,7 +3041,10 @@ static uc_err uc_restore_latest_snapshot(struct uc_struct *uc)
 
     return UC_ERR_OK;
 }
-
+UNICORN_EXPORT
+uc_err uc_get_Cached_Seg(uc_engine* uc,void** ptr,int i) {
+    *ptr = uc->cpu->cc->getSegCache(uc,i);
+}
 #ifdef UNICORN_TRACER
 uc_tracer *get_tracer()
 {

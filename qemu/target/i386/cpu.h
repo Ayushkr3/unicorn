@@ -2134,5 +2134,6 @@ void x86_update_hflags(CPUX86State* env);
 
 int uc_check_cpu_x86_load_seg(CPUX86State *env, int seg_reg, int sel);
 X86CPU *cpu_x86_init(struct uc_struct *uc);
+void *cpu_x86_getSegC(struct uc_struct *uc,int id);
 
 #endif /* I386_CPU_H */

@@ -5068,7 +5068,19 @@ static void x86_cpu_common_class_init(struct uc_struct *uc, CPUClass *oc, void *
     cc->tcg_initialize = tcg_x86_init;
     cc->tlb_fill_cpu = x86_cpu_tlb_fill;
 }
-
+void* cpu_x86_getSegC(struct uc_struct *uc, int i)
+{
+    if (i < 6) {
+        return ((CPUX86State *)uc->cpu->env_ptr)->segs+i;
+    }
+    else if (i == 7) {
+        return &((CPUX86State *)uc->cpu->env_ptr)->gdt;
+    } else if (i == 8) {
+        return &((CPUX86State *)uc->cpu->env_ptr)->ldt;
+    } else {
+        return &((CPUX86State *)uc->cpu->env_ptr)->idt;
+    }
+}
 X86CPU *cpu_x86_init(struct uc_struct *uc)
 {
     X86CPU *cpu;
@@ -5103,7 +5115,7 @@ X86CPU *cpu_x86_init(struct uc_struct *uc)
     cpu->env.cpuid_level = UINT32_MAX;
     cpu->env.cpuid_xlevel = UINT32_MAX;
     cpu->env.cpuid_xlevel2 = UINT32_MAX;
-
+    cc->getSegCache = cpu_x86_getSegC;
     /* init CPUClass */
     cpu_class_init(uc, cc);
 

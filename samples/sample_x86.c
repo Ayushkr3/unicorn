@@ -1122,7 +1122,6 @@ static void test_x86_16(void)
     int32_t eax = 7;
     int32_t ebx = 5;
     int32_t esi = 6;
-
     printf("Emulate x86 16-bit code\n");
 
     // Initialize emulator in X86-16bit mode
@@ -1148,7 +1147,7 @@ static void test_x86_16(void)
 
     // emulate machine code in infinite time (last param = 0), or when
     // finishing all the code.
-    err = uc_emu_start(uc, 0, sizeof(X86_CODE16) - 1, 0, 0);
+    err = uc_emu_start(uc, 0, sizeof(X86_CODE16) - 1, 0, 15);
     if (err) {
         printf("Failed on uc_emu_start() with error returned %u: %s\n", err,
                uc_strerror(err));

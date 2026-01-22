@@ -1448,6 +1448,14 @@ size_t uc_context_size(uc_engine *uc);
 */
 UNICORN_EXPORT
 uc_err uc_context_free(uc_context *context);
+/*
+ 0 to 5 for array
+ 6 gdt
+ 7 ldt
+ 8 idt
+*/
+UNICORN_EXPORT
+uc_err uc_get_Cached_Seg(uc_engine *uc, void **ptr, int i);
 
 #ifdef __cplusplus
 }

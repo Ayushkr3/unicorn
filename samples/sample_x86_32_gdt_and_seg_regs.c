@@ -121,6 +121,10 @@ static void hook_mem(uc_engine *uc, uc_mem_type type, uint64_t address,
 static void hook_code(uc_engine *uc, uint64_t address, uint32_t size,
                       void *user_data)
 {
+    int CS;
+    uc_reg_read(uc, UC_X86_REG_CS,&CS);
+    uc_reg_read(uc, UC_X86_REG_DS, &CS);
+    uc_reg_read(uc, UC_X86_REG_GS, &CS);
     printf("Executing at 0x%" PRIx64 ", ilen = 0x%x\n", address, size);
 }
 
