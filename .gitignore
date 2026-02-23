@@ -56,9 +56,9 @@ bindings/python/MANIFEST
 Cargo.lock
 config.log
 
-output
-out
-
+output/
+out/
+.vs/
 #################
 ## Visual Studio
 #################
