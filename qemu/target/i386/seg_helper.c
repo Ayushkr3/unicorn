@@ -600,7 +600,7 @@ static int exception_has_error_code(int intno)
 #define POPL(ssp, sp, sp_mask, val) POPL_RA(ssp, sp, sp_mask, val, 0)
 
 /* protected mode interrupt */
-static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
+void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
                                    int error_code, unsigned int next_eip,
                                    int is_hw)
 {

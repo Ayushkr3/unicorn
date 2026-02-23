@@ -1457,6 +1457,9 @@ uc_err uc_context_free(uc_context *context);
 UNICORN_EXPORT
 uc_err uc_get_Cached_Seg(uc_engine *uc, void **ptr, int i);
 
+UNICORN_EXPORT
+uc_err uc_protected_int_call(uc_engine *uc, int intnum);
+
 #ifdef __cplusplus
 }
 #endif

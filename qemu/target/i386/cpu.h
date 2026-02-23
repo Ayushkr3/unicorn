@@ -1447,8 +1447,10 @@ typedef struct CPUX86State {
     target_ulong sysenter_esp;
     target_ulong sysenter_eip;
     uint64_t star;
-
+    uint64_t acpi_base;
     uint64_t vm_hsave;
+
+    uint32_t UnicornCall;
 
 #ifdef TARGET_X86_64
     target_ulong lstar;

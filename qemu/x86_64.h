@@ -1853,6 +1853,7 @@
 #define helper_sysret helper_sysret_x86_64
 #define x86_cpu_do_interrupt x86_cpu_do_interrupt_x86_64
 #define do_interrupt_x86_hardirq do_interrupt_x86_hardirq_x86_64
+#define do_interrupt_x86_protected do_interrupt_protected
 #define x86_cpu_exec_interrupt x86_cpu_exec_interrupt_x86_64
 #define helper_lldt helper_lldt_x86_64
 #define helper_ltr helper_ltr_x86_64

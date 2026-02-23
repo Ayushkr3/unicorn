@@ -198,10 +198,10 @@ static int x86_msr_read(CPUX86State *env, uc_x86_msr *msr)
     uint64_t ecx = env->regs[R_ECX];
     uint64_t eax = env->regs[R_EAX];
     uint64_t edx = env->regs[R_EDX];
-
+    env->UnicornCall = 1;
     env->regs[R_ECX] = msr->rid;
     helper_rdmsr(env);
-
+    env->UnicornCall = 0;
     msr->value = ((uint32_t)env->regs[R_EAX]) |
                  ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
 
@@ -223,8 +223,9 @@ static int x86_msr_write(CPUX86State *env, uc_x86_msr *msr)
     env->regs[R_ECX] = msr->rid;
     env->regs[R_EAX] = (unsigned int)msr->value;
     env->regs[R_EDX] = (unsigned int)(msr->value >> 32);
+    env->UnicornCall = 1;
     helper_wrmsr(env);
-
+    env->UnicornCall = 0;
     env->regs[R_ECX] = ecx;
     env->regs[R_EAX] = eax;
     env->regs[R_EDX] = edx;
@@ -2028,7 +2029,8 @@ static bool x86_insn_hook_validate(uint32_t insn_enum)
     if (insn_enum != UC_X86_INS_IN && insn_enum != UC_X86_INS_OUT &&
         insn_enum != UC_X86_INS_SYSCALL && insn_enum != UC_X86_INS_SYSENTER &&
         insn_enum != UC_X86_INS_CPUID && insn_enum != UC_X86_INS_RDTSC &&
-        insn_enum != UC_X86_INS_RDTSCP) {
+        insn_enum != UC_X86_INS_RDTSCP && insn_enum != UC_X86_INS_WRMSR &&
+        insn_enum != UC_X86_INS_RDMSR) {
         return false;
     }
     return true;
@@ -2085,5 +2087,11 @@ void uc_init(struct uc_struct *uc)
     uc->cpu_context_size = offsetof(CPUX86State, end_reset_fields);
     uc_common_init(uc);
 }
-
+uc_err uc_protected_int_call(uc_engine *uc, int intnum)
+{
+    CPUX86State *env = (CPUX86State *)uc->cpu->env_ptr;
+    //x86_cpu_do_interrupt(uc->cpu);
+    do_interrupt_x86_hardirq(env, intnum,1);
+    return UC_ERR_OK;
+}
 /* vim: set ts=4 sts=4 sw=4 et:  */

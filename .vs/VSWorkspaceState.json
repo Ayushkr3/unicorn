@@ -1,12 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\include",
-    "\\qemu",
     "\\qemu\\target",
-    "\\qemu\\target\\i386",
-    "\\samples"
+    "\\qemu\\target\\i386"
   ],
-  "SelectedNode": "\\uc.c",
   "PreviewInSolutionExplorer": false
 }

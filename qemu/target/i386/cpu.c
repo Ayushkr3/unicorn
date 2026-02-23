@@ -4038,6 +4038,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
             *ecx |= CPUID_EXT_OSXSAVE;
         }
         *edx = env->features[FEAT_1_EDX];
+        *edx |= (1<<22);
+        *ecx &= ~(1 << 21);
+        *edx &= ~(1 << 4);
         if (cs->nr_cores * cs->nr_threads > 1) {
             *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
             *edx |= CPUID_HT;
@@ -5073,12 +5076,14 @@ void* cpu_x86_getSegC(struct uc_struct *uc, int i)
     if (i < 6) {
         return ((CPUX86State *)uc->cpu->env_ptr)->segs+i;
     }
-    else if (i == 7) {
+    else if (i == 6) {
         return &((CPUX86State *)uc->cpu->env_ptr)->gdt;
-    } else if (i == 8) {
+    } else if (i == 7) {
         return &((CPUX86State *)uc->cpu->env_ptr)->ldt;
-    } else {
+    } else if (i==8){
         return &((CPUX86State *)uc->cpu->env_ptr)->idt;
+    } else {
+        return NULL;
     }
 }
 X86CPU *cpu_x86_init(struct uc_struct *uc)

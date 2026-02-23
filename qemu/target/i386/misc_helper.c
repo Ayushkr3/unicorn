@@ -333,7 +333,8 @@ void helper_wrmsr(CPUX86State *env)
         env->sysenter_eip = val;
         break;
     case MSR_IA32_APICBASE:
-        // cpu_set_apic_base(env_archcpu(env)->apic_state, val);
+        //cpu_set_apic_base(env_archcpu(env)->apic_state, val);
+        env->acpi_base = val;
         break;
     case MSR_EFER:
         {
@@ -471,6 +472,34 @@ void helper_wrmsr(CPUX86State *env)
         /* XXX: exception? */
         break;
     }
+    if (!env->UnicornCall) {
+        bool synced = false;
+        uc_engine *uc = env->uc;
+        struct hook *hook;
+        int skip_wrmsr = 0;
+        HOOK_FOREACH_VAR_DECLARE;
+        HOOK_FOREACH(env->uc, hook, UC_HOOK_INSN)
+        {
+            if (hook->to_delete)
+                continue;
+            if (!HOOK_BOUND_CHECK(hook, env->eip))
+                continue;
+
+            if (hook->insn == UC_X86_INS_WRMSR) {
+                uintptr_t pc = GETPC();
+                if (!synced && !uc->skip_sync_pc_on_exit && pc) {
+                    cpu_restore_state(uc->cpu, pc, false);
+                    synced = true;
+                }
+                JIT_CALLBACK_GUARD_VAR(skip_wrmsr,
+                                       ((uc_cb_insn_wrmsr_t)hook->callback)(
+                                           env->uc, hook->user_data));
+            }
+            // the last callback may already asked to stop emulation
+            if (env->uc->stop_request)
+                return;
+        }
+    }
 }
 
 void helper_rdmsr(CPUX86State *env)
@@ -491,7 +520,7 @@ void helper_rdmsr(CPUX86State *env)
         val = env->sysenter_eip;
         break;
     case MSR_IA32_APICBASE:
-        val = 0; // cpu_get_apic_base(env_archcpu(env)->apic_state);
+        val = env->acpi_base; // cpu_get_apic_base(env_archcpu(env)->apic_state);
         break;
     case MSR_EFER:
         val = env->efer;
@@ -624,8 +653,38 @@ void helper_rdmsr(CPUX86State *env)
         val = 0;
         break;
     }
+    //If user change reg in hook this value will skipped other wise as defualt backup
     env->regs[R_EAX] = (uint32_t)(val);
     env->regs[R_EDX] = (uint32_t)(val >> 32);
+    
+    if (!env->UnicornCall) {
+        bool synced = false;
+        uc_engine *uc = env->uc;
+        struct hook *hook;
+        int skip_rdmsr = 0;
+        HOOK_FOREACH_VAR_DECLARE;
+        HOOK_FOREACH(env->uc, hook, UC_HOOK_INSN)
+        {
+            if (hook->to_delete)
+                continue;
+            if (!HOOK_BOUND_CHECK(hook, env->eip))
+                continue;
+
+            if (hook->insn == UC_X86_INS_RDMSR) {
+                uintptr_t pc = GETPC();
+                if (!synced && !uc->skip_sync_pc_on_exit && pc) {
+                    cpu_restore_state(uc->cpu, pc, false);
+                    synced = true;
+                }
+                JIT_CALLBACK_GUARD_VAR(skip_rdmsr,
+                                       ((uc_cb_insn_rdmsr_t)hook->callback)(
+                                           env->uc, hook->user_data));
+            }
+            // the last callback may already asked to stop emulation
+            if (env->uc->stop_request)
+                return;
+        }
+    }
 }
 
 static void do_pause(X86CPU *cpu)
